@@ -76,13 +76,14 @@ ITEM_PIPELINES = {
 
 LOG_LEVEL = 'INFO'
 
-# Replace default scheduler with redis scheduler.
+# Replace default scheduler with scrapy-redis scheduler.
 SCHEDULER = 'scrapy_redis.scheduler.Scheduler'
 DUPEFILTER_CLASS = 'scrapy_redis.dupefilter.RFPDupeFilter'
 SCHEDULER_PERSIST = True
 SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.SpiderPriorityQueue'
 
-REDIS_HOST = '114.212.85.122'
+REDIS_HOST = 'your redis host'
+# your redis port
 REDIS_PORT = 6379
 
 
@@ -108,28 +109,41 @@ AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 # Your whole weibo username and password pairs.
-WEIBO_LOGIN_INFO_LIST = [('15261896839', 'xl9307_PIG'), ('joeyt.firefly@outlook.com', 'mpn6839_PIG')]
+WEIBO_LOGIN_INFO_LIST = [('your username_1', 'your password_1'), ('your username_2', 'your password_2'), ...]
 # Each name of tables can be defined here (each value of items).
 TABLE_NAME_DICT = {
-    'user_info': 'user_info',
-    'follow': 'follow',
-    'fan': 'fan',
-    'post_info': 'post_info',
-    'text': 'text',
-    'image': 'image',
-    'comment': 'comment',
-    'forward': 'forward',
-    'thumbup': 'thumbup'
+    'user_info': 'user_info_table_name',
+    'follow': 'follow_table_name',
+    'fan': 'fan_table_name',
+    'post_info': 'post_info_table_name',
+    'text': 'text_table_name',
+    'image': 'image_table_name',
+    'comment': 'comment_table_name',
+    'forward': 'forward_table_name',
+    'thumbup': 'thumbup_table_name'
 }
 
 # Your postgresql username (that must be connected without password).
-POSTGRESQL_USERNAME = 'cuckootan'
+POSTGRESQL_USERNAME = 'your postgresql username'
 # Your postgresql password.
-POSTGRESQL_PASSWORD = 'xl9307_PIG'
+POSTGRESQL_PASSWORD = 'your postgresql password'
 # Your postgresql host.
-POSTGRESQL_HOST = '114.212.85.122'
+POSTGRESQL_HOST = 'your postgresql password'
 # Your postgresql databaes.
-POSTGRESQL_DATABASE = 'weibo'
+POSTGRESQL_DATABASE = 'your postgresql database'
 
 # The IDs of users you want to crawl.
-CRAWLED_WEIBO_ID_LIST = ['1197161814']
+CRAWLED_WEIBO_ID_LIST = ['id_1', 'id_2', ...]
+
+# Email notification.
+MAIL_ENABLED = False
+MAIL_FROM = 'your email'
+MAIL_HOST = 'your email smtp server host'
+# Your email smtp server port
+MAIL_PORT = 587
+MAIL_USER = 'your email'
+MAIL_PASS = 'your email password'
+# YOur email smtp server port type
+MAIL_TLS = True
+MAIL_SSL = False
+TO_ADDR = 'send to where'

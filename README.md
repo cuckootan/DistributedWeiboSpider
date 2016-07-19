@@ -35,7 +35,7 @@
     `sudo apt-get install python3-dev`
 
     `sudo apt-get install python3-pip`
--   Python下的 scrapy包，requests包，rsa包，scrapy-redis包，PostgreSQL 在python3 下的驱动 psycopg2
+-   Python下的 scrapy包，requests包，rsa包，scrapy-redis包，PostgreSQL 在 Python3 下的驱动 psycopg2
 
     `sudo python3 -m pip install -U requests`
 
@@ -73,9 +73,9 @@
 
 ## 4 安装及运行
 
-下载到本地：
+下载到各个 Slave 上：
 
-`git clone https://github.com/cuckootan/WeiboSpider.git`
+`git clone https://github.com/cuckootan/DistributedWeiboSpider.git`
 
 然后进入项目根目录，执行如下命令即可运行（前提是要对该项目配置完成，见下面）：
 
@@ -98,12 +98,9 @@
     -   取消 **Add content roots to PYTHONPATH** 以及 **Add source roots to PYTHONPATH**。
 2.   配置 PostgreSQL 并建立数据库。打开 **/etc/postgresql/9.5/main/pg_hba.conf**，添加如下字段到更改用户权限的相应位置。
     
-    **local    all    your_username    trust**
-    
-    或者
-    
-    **local    all    your_username    md5**
-3.   程序中用到的所有配置都写在了项目中的 **settings.py** 里，因此将项目下载到本地后，只需配置更改其中的相应内容即可，无序修改其他源程序。
+    **host    all    your_username    所有的 salve 所在的网段    trust**
+3.  配置 Redis。打开 **/etc/redis/redis-conf**，注释掉 bind 所在行。
+4.  程序中用到的所有配置都写在了项目中的 **settings.py** 里，因此将项目下载到本地后，只需配置更改其中的相应内容即可，无序修改其他源程序。
     主要包括：
 
     ```python
@@ -121,6 +118,15 @@
             'forward': 'forward_table_name',
             'thumbup': 'thumbup_table_name'
         }
+        
+        # Replace default scheduler with scrapy-redis scheduler.
+        SCHEDULER = 'scrapy_redis.scheduler.Scheduler'
+        DUPEFILTER_CLASS = 'scrapy_redis.dupefilter.RFTDupeFilter'
+        SCHEDULER_PERSIST = True
+        SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.SpiderPriorityQueue'
+
+        REDIS_HOST = 'your redis host'
+        REDIS_PORT = 'your redis port'
 
         # Your postgresql username.
         POSTGRESQL_USERNAME = 'your postgresql username'
@@ -155,3 +161,8 @@
 其中，**$ABSOLUTE_PATH** 为每个表对应输出文件的 **绝对路径**。
 
 对于表中 json 类型的字段，在输出到文件后用 python3 中的 json 包进行处理即可。
+
+## TODO
+
+-  添加用于实时查看爬虫信息的图形化界面（用 Graphite 实现）；
+-   添加代理，减小被 ban 的几率。
