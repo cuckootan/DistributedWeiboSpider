@@ -24,7 +24,7 @@ NEWSPIDER_MODULE = 'DistributedWeiboSpider.spiders'
 CONCURRENT_ITEMS = 100
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 16
+CONCURRENT_REQUESTS = 5
 
 # Configure a delay for requests for the same website (default: 0)
 # See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay
@@ -32,7 +32,7 @@ CONCURRENT_REQUESTS = 16
 DOWNLOAD_DELAY = 1
 DOWNLOAD_TIMEOUT = 300
 # The download delay setting will honor only one of:
-CONCURRENT_REQUESTS_PER_DOMAIN = 16
+CONCURRENT_REQUESTS_PER_DOMAIN = 5
 #CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
@@ -79,11 +79,14 @@ LOG_LEVEL = 'INFO'
 # Replace default scheduler with scrapy-redis scheduler.
 SCHEDULER = 'scrapy_redis.scheduler.Scheduler'
 DUPEFILTER_CLASS = 'scrapy_redis.dupefilter.RFPDupeFilter'
-SCHEDULER_PERSIST = True
-SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.SpiderPriorityQueue'
+# If this value below is set to False, when spider is closed normally, all the data in redis will be cleared.
+SCHEDULER_PERSIST = False
+SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.SpiderQueue'
+# Sometimes the queue is empty, but the task is not finished. So you'd better set the value below.
+SCHEDULER_IDLE_BEFORE_CLOSE = 20
 
 REDIS_HOST = 'your redis host'
-# your redis port
+# Your redis port. Default is 6379.
 REDIS_PORT = 6379
 
 
@@ -91,9 +94,9 @@ REDIS_PORT = 6379
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
 AUTOTHROTTLE_ENABLED = True
 # The initial download delay
-AUTOTHROTTLE_START_DELAY = 5
+AUTOTHROTTLE_START_DELAY = 2
 # The maximum download delay to be set in case of high latencies
-AUTOTHROTTLE_MAX_DELAY = 60
+AUTOTHROTTLE_MAX_DELAY = 10
 # The average number of requests Scrapy should be sending in parallel to
 # each remote server
 AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
@@ -110,7 +113,7 @@ AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
 
 # Your whole weibo username and password pairs.
 WEIBO_LOGIN_INFO_LIST = [('your username_1', 'your password_1'), ('your username_2', 'your password_2'), ...]
-# Each name of tables can be defined here (each value of items).
+# Each name of tables can be defined here (each value of items). These keys are not changeable.
 TABLE_NAME_DICT = {
     'user_info': 'user_info_table_name',
     'follow': 'follow_table_name',
@@ -123,12 +126,12 @@ TABLE_NAME_DICT = {
     'thumbup': 'thumbup_table_name'
 }
 
-# Your postgresql username (that must be connected without password).
+# Your postgresql username.
 POSTGRESQL_USERNAME = 'your postgresql username'
 # Your postgresql password.
 POSTGRESQL_PASSWORD = 'your postgresql password'
 # Your postgresql host.
-POSTGRESQL_HOST = 'your postgresql password'
+POSTGRESQL_HOST = 'your postgresql host'
 # Your postgresql databaes.
 POSTGRESQL_DATABASE = 'your postgresql database'
 

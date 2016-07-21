@@ -17,11 +17,12 @@ class DistributedWeibospiderPipeline(object):
     def __init__(self, settings):
         self.username = settings.get('POSTGRESQL_USERNAME')
         self.password = settings.get('POSTGRESQL_PASSWORD')
+        self.host = settings.get('POSTGRESQL_HOST')
         self.database = settings.get('POSTGRESQL_DATABASE')
         self.table_name_dict = settings.get('TABLE_NAME_DICT')
        
         self.mail_enabled = settings.get('MAIL_ENABLED')
-        if self.mail_enabled == True:
+        if self.mail_enabled:
             self.emailer = EmailSender()
             self.emailer.from_settings(settings)
             self.to_addr = settings.get('TO_ADDR')
@@ -51,67 +52,19 @@ class DistributedWeibospiderPipeline(object):
             self.connector = psycopg2.connect(
                 user = self.username,
                 password = self.password,
+                host = self.host,
                 database = self.database
             )
             self.cursor = self.connector.cursor()
             self.logger.info('Conneting to database successfully!')
         except psycopg2.Error as e:
-            sys.exit('Failed to connect database. Returned: {0:s}'.format(errorcodes.looup(e.pgcode)))
-
-        # 如果表不存在，则首先建表。
-        self.cursor.execute(
-            'CREATE TABLE IF NOT EXISTS {0:s} (user_id varchar(20), user_name text, gender varchar(5), district text);'.format(
-                self.table_name_dict['user_info']
-            )
-        )
-        self.cursor.execute(
-            'CREATE TABLE IF NOT EXISTS {0:s} (user_id varchar(20), follow_list text[]);'.format(
-                self.table_name_dict['follow']
-            )
-        )
-        self.cursor.execute(
-            'CREATE TABLE IF NOT EXISTS {0:s} (user_id varchar(20), fan_list text[]);'.format(
-                self.table_name_dict['fan']
-            )
-        )
-        self.cursor.execute(
-            'CREATE TABLE IF NOT EXISTS {0:s} (user_id varchar(20), post_id varchar(20), publish_time text);'.format(
-                self.table_name_dict['post_info']
-            )
-        )
-        self.cursor.execute(
-            'CREATE TABLE IF NOT EXISTS {0:s} (user_id varchar(20), post_id varchar(20), text text);'.format(
-                self.table_name_dict['text']
-            )
-        )
-        self.cursor.execute(
-            'CREATE TABLE IF NOT EXISTS {0:s} (user_id varchar(20), post_id varchar(20), image_list text[]);'.format(
-                self.table_name_dict['image']
-            )
-        )
-        self.cursor.execute(
-            'CREATE TABLE IF NOT EXISTS {0:s} (user_id varchar(20), post_id varchar(20), comment_list json);'.format(
-                self.table_name_dict['comment']
-            )
-        )
-        self.cursor.execute(
-            'CREATE TABLE IF NOT EXISTS {0:s} (user_id varchar(20), post_id varchar(20), forward_list json);'.format(
-                self.table_name_dict['forward']
-            )
-        )
-        self.cursor.execute(
-            'CREATE TABLE IF NOT EXISTS {0:s} (user_id varchar(20), post_id varchar(20), thumbup_list json);'.format(
-                self.table_name_dict['thumbup']
-            )
-        )
-        self.connector.commit()
-        self.logger.info('Table check finished!')
+            sys.exit('Failed to connect database. Returned: {0:s}'.format(errorcodes.lookup(e.pgcode)))
 
     def close_spider(self, spider):
         self.cursor.close()
         self.connector.close()
         
-        if self.mail_enabled == True:
+        if self.mail_enabled:
             self.emailer.send(
                 to_addr = self.to_addr,
                 subject = '爬虫结束',
