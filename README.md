@@ -20,7 +20,7 @@
 
 大概思路如下：
 
--   scrapy 中的 scheduler 是一个 request 调度器，用以响应 engine 发出的指令而调度多个 request 给 downloader。这些 request 存放在一个队列（LIFO 队列或者 FIFO 队列），spider 每生成一个 request 就会存入到 scheduler 的这个队列中。如果有相同的 request，scrapy 会自动去重。由于去重后的 request 之间是相互独立的，因此要提高并发能力，只需要将 scheduler 分离开，放到一个 master 中，多个 slave 每次访问这个 master 上 scheduler 中的队列即可。
+-   scrapy 中的 scheduler 是一个 request 调度器，用以响应 engine 发出的指令而调度多个 request 给 downloader。spider 每生成一个 request 就会存入到 scheduler 的这个队列中。如果有相同的 request，scrapy 会自动去重。由于去重后的 request 之间是相互独立的，因此要提高并发能力，只需要将 scheduler 分离开，放到一个 master 中，多个 slave 每次访问这个 master 上 scheduler 中的队列即可。
 -   可以利用 scrapy-redis 包实现这一点。它利用 redis 作为队列，实现了 scheduler 的功能。redis 是一个高性能的 key-value 数据库，而且 redis 客户可以方便地远程访问 redis 服务端。其具体使用只需要在项目中的 settings.py 中进行配置即可。
 -   分布式爬虫一般都会碰到去重的问题。每个 request 在进入队列之前，都需要判断是否与已有的所有 request 重复。如果不重复则才放到队列里。由于这里用了 scrapy-redis 定义的 scheduler，因此也需要用 scrapy-redis 定义好的去重工具。同样在 settings.py 中进行配置。
 -   爬取好的 item 存储到 Master 上的 PostgreSQL 的数据库里。
