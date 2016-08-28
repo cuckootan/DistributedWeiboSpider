@@ -24,7 +24,7 @@ NEWSPIDER_MODULE = 'DistributedWeiboSpider.spiders'
 CONCURRENT_ITEMS = 100
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-CONCURRENT_REQUESTS = 5
+CONCURRENT_REQUESTS = 10
 
 # Configure a delay for requests for the same website (default: 0)
 # See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay
@@ -32,7 +32,7 @@ CONCURRENT_REQUESTS = 5
 DOWNLOAD_DELAY = 1
 DOWNLOAD_TIMEOUT = 300
 # The download delay setting will honor only one of:
-CONCURRENT_REQUESTS_PER_DOMAIN = 5
+CONCURRENT_REQUESTS_PER_DOMAIN = 10
 #CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
@@ -133,10 +133,10 @@ POSTGRESQL_PASSWORD = 'your postgresql password'
 # Your postgresql host.
 POSTGRESQL_HOST = 'your postgresql host'
 # Your postgresql databaes.
-POSTGRESQL_DATABASE = 'your postgresql database'
+POSTGRESQL_DATABASE = 'your postgresql database name'
 
 # The IDs of users you want to crawl.
-CRAWLED_WEIBO_ID_LIST = ['id_1', 'id_2', ...]
+CRAWLED_WEIBO_ID_LIST = ['123456789', '246812345', ...]
 
 # Email notification.
 MAIL_ENABLED = False
