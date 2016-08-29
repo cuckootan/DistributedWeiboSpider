@@ -107,8 +107,21 @@
     主要包括：
 
     ```python
+        # Replace default scheduler with scrapy-redis scheduler.
+        SCHEDULER = 'scrapy_redis.scheduler.Scheduler'
+        DUPEFILTER_CLASS = 'scrapy_redis.dupefilter.RFPDupeFilter'
+        # If this value below is set to False, when spider is closed normally, all the data in redis will be cleared.
+        SCHEDULER_PERSIST = False
+        SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.SpiderQueue'
+        # Sometimes the queue is empty, but the task is not finished. So you'd better set the value below.
+        SCHEDULER_IDLE_BEFORE_CLOSE = 20
+
+        REDIS_HOST = 'your redis host'
+        # Your redis port. Default is 6379.
+        REDIS_PORT = 6379
+
         # Your whole weibo username and password pairs.
-        WEIBO_LOGIN_INFO_LIST = [('your username_1', 'your password_1'), ('your username_2', 'your password_2')]
+        WEIBO_LOGIN_INFO_LIST = [('your username_1', 'your password_1'), ('your username_2', 'your password_2'), ...]
         # Each name of tables can be defined here (each value of items). These keys are not changeable.
         TABLE_NAME_DICT = {
             'user_info': 'user_info_table_name',
@@ -121,29 +134,33 @@
             'forward': 'forward_table_name',
             'thumbup': 'thumbup_table_name'
         }
-        
-        # Replace default scheduler with scrapy-redis scheduler.
-        SCHEDULER = 'scrapy_redis.scheduler.Scheduler'
-        DUPEFILTER_CLASS = 'scrapy_redis.dupefilter.RFTDupeFilter'
-        # If this value below is set to False, when spider is closed normally, all the data in redis will be cleared.
-        SCHEDULER_PERSIST = True
-        SCHEDULER_QUEUE_CLASS = 'scrapy_redis.queue.SpiderQueue'
-        # Sometimes the queue is empty, but the task is not finisher. So you'd better set the value below.
-        SCHEDULER_IDLE_BEFORE_CLOSE = 300
-
-        REDIS_HOST = 'your redis host'
-        REDIS_PORT = 'your redis port'
 
         # Your postgresql username.
         POSTGRESQL_USERNAME = 'your postgresql username'
         # Your postgresql password.
         POSTGRESQL_PASSWORD = 'your postgresql password'
+        # Your postgresql host.
+        POSTGRESQL_HOST = 'your postgresql host'
         # Your postgresql databaes.
-        POSTGRESQL_DATABASE = 'your database name'
+        POSTGRESQL_DATABASE = 'your postgresql database name'
 
-        # The user id you want to crawl.
-        CRAWLED_WEIBO_ID_LIST = ['123456789', '246812345']
+        # The IDs of users you want to crawl.
+        CRAWLED_WEIBO_ID_LIST = ['123456789', '246812345', ...]
+
+        # Email notification.
+        MAIL_ENABLED = False
+        MAIL_FROM = 'your email'
+        MAIL_HOST = 'your email smtp server host'
+        # Your email smtp server port
+        MAIL_PORT = 587
+        MAIL_USER = 'your email'
+        MAIL_PASS = 'your email password'
+        # YOur email smtp server port type
+        MAIL_TLS = True
+        MAIL_SSL = False
+        TO_ADDR = 'send to where'
     ```
+
     其中，各个表的所有列的字段及数据类型分别为（它们不能被改变，表名可以改变）：
     
     -   user_info 对应表的结构为： **(user_id varchar(20), user_name text, gender varchar(5), district text)**
