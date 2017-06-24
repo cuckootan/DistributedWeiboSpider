@@ -59,6 +59,39 @@
 -   Redis
 
     `sudo apt-get install redis-server`
+-   配置数据库
+
+    建立登录账号及数据库：
+
+    ```Shell
+        sudo -u postgres psql
+
+        # username 为登录用户名，password　为该用户的密码.
+        CREATE USER username WITH ENCRYPTED PASSWORD 'password';
+        # databse_name 为数据库名，username 为数据库的拥有者.
+        CREATE DATABASE database_name OWNER username;
+        # 之后退出.
+    ```
+
+    打开权限配置文件 **/etc/postgresql/9.5/main/pg\_hba.conf**，找到 **# IPv4 local connections**，在后面添加：
+
+    ```Shell
+        # username 为登录用户名.
+        host database_name username 网段 md5
+    ```
+
+    比如，**host weibo hello 114.212.0.0/16 md5**　表示这个网段内的所有主机可以通过登录 hello 账号来访问数据库 weibo。
+
+    打开连接配置文件 **/etc/postgresql/9.5/main/postgresql.conf**，找到 **# listen\_address = 'localhost'**，取消注释，并将其设置为：
+
+    ```Shell
+        listen_address = '*'
+    ```
+
+    配置完成后，重启服务：
+
+    `sudo service postgresql restart`
+-   配置 Redis。打开 **/etc/redis/redis-conf**，注释掉 bind 所在行。
 
 ## 4 安装及运行
 
@@ -87,14 +120,7 @@
     -   将 **Python interpreter** 字段填写为 python3 解释器的路径；
     -   将 **Working directory** 字段填写为该项目的根目录的路径。比如：**/home/username/Project/WeiboSpider**；
     -   取消 **Add content roots to PYTHONPATH** 以及 **Add source roots to PYTHONPATH**。
-2.   配置 PostgreSQL 并建立数据库。打开 **/etc/postgresql/9.5/main/pg_hba.conf**，添加如下字段到更改用户权限的相应位置。
-
-    ```Shell
-        host    all    your_username    所有的 salve 所在的网段    trust
-    ```
-
-3.  配置 Redis。打开 **/etc/redis/redis-conf**，注释掉 bind 所在行。
-4.  程序中用到的所有配置都写在了项目中的 **settings.py** 里，因此将项目下载到本地后，只需配置更改其中的相应内容即可，无需修改其他源程序。
+2.  程序中用到的所有配置都写在了项目中的 **settings.py** 里，因此将项目下载到本地后，只需配置更改其中的相应内容即可，无需修改其他源程序。
 
     与 Redis 相关的主要包括：
 
