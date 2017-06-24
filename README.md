@@ -90,7 +90,7 @@
 2.   配置 PostgreSQL 并建立数据库。打开 **/etc/postgresql/9.5/main/pg_hba.conf**，添加如下字段到更改用户权限的相应位置。
 
     ```
-        host    all    your_username    所有的 salve 所在的网段    trust
+    host    all    your_username    所有的 salve 所在的网段    trust
     ```
 3.  配置 Redis。打开 **/etc/redis/redis-conf**，注释掉 bind 所在行。
 4.  程序中用到的所有配置都写在了项目中的 **settings.py** 里，因此将项目下载到本地后，只需配置更改其中的相应内容即可，无需修改其他源程序。
