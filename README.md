@@ -4,18 +4,6 @@
 
 ## 1 简介
 
-该程序用于爬取新浪微博的数据，主要用于学术研究。具体数据包括：
-
--   发布微博的作者的个人信息，包括用户ID，昵称，性别，地区；
--   作者的所有关注的人；
--   作者的所有粉丝；
--   作者发布的所有微博的微博ID，发布时间；
--   每条微博的文字；
--   每条微博的所有图片；
--   每条微博的所有评论者的昵称，评论的文字，以及评论的时间；
--   每条微博的所有转发者的昵称，以及转发的时间；
--   每条微博的所有点赞者的昵称，以及点赞的时间。
-
 [新浪微博爬虫单机版](https://github.com/cuckootan/WeiboSpider) 的性能较低，在爬取的时候平均爬取 100 条微博的所有数据需要长达 6 个多小时。因此，有必要将其扩展为分布式结构，利用集群（采用单Master-多Slave结构）提高并发能力，从而提高爬取性能。
 
 大概思路如下：
@@ -45,7 +33,7 @@
     `sudo apt-get install libxml2-dev libxslt1-dev libffi-dev libssl-dev`
 
     `sudo python3 -m pip install -U scrapy`
-    
+
     `sudo python3 -m pip install -U scrapy-redis`
 
     `sudo apt-get install libpq-dev`
@@ -63,7 +51,7 @@
     `sudo apt-get install python3-dev`
 
     `sudo apt-get install python3-pip`
-   
+
 -   PostgreSQL
 
     `sudo apt-get install postgresql`
@@ -74,9 +62,9 @@
 
 ## 4 安装及运行
 
-下载到各个 Slave 上：
+下载 WeiboSpider 到各个 Slave 上：
 
-`git clone https://github.com/cuckootan/DistributedWeiboSpider.git`
+`git clone https://github.com/cuckootan/WeiboSpider.git`
 
 然后在 Master 上的 PostgreSQL 里用以存储爬取的数据库中创建各个表。创建完成后将这些表的名字写入到各个 Slave 中的 settings.py 中。
 
@@ -91,20 +79,20 @@
 ## 5 配置说明
 
 1.  选用 Pycharm 作为开发及调试工具；
-    
+
     打开 **Run -> Edit Configurations**，点击左上角的 **+** 添加配置信息。
-    
+
     -   将 **Script** 字段填写为 **/usr/local/bin/scrapy**；
     -   将 **Script parameters** 字段填写为 **crawl weibo**；
     -   将 **Python interpreter** 字段填写为 python3 解释器的路径；
     -   将 **Working directory** 字段填写为该项目的根目录的路径。比如：**/home/username/Project/WeiboSpider**；
     -   取消 **Add content roots to PYTHONPATH** 以及 **Add source roots to PYTHONPATH**。
 2.   配置 PostgreSQL 并建立数据库。打开 **/etc/postgresql/9.5/main/pg_hba.conf**，添加如下字段到更改用户权限的相应位置。
-    
+
     **host    all    your_username    所有的 salve 所在的网段    trust**
 3.  配置 Redis。打开 **/etc/redis/redis-conf**，注释掉 bind 所在行。
-4.  程序中用到的所有配置都写在了项目中的 **settings.py** 里，因此将项目下载到本地后，只需配置更改其中的相应内容即可，无序修改其他源程序。
-    主要包括：
+4.  程序中用到的所有配置都写在了项目中的 **settings.py** 里，因此将项目下载到本地后，只需配置更改其中的相应内容即可，无需修改其他源程序。
+    与 Redis 相关的主要包括：
 
     ```python
         # Replace default scheduler with scrapy-redis scheduler.
@@ -119,59 +107,7 @@
         REDIS_HOST = 'your redis host'
         # Your redis port. Default is 6379.
         REDIS_PORT = 6379
-
-        # Your whole weibo username and password pairs.
-        WEIBO_LOGIN_INFO_LIST = [('your username_1', 'your password_1'), ('your username_2', 'your password_2'), ...]
-        # Each name of tables can be defined here (each value of items). These keys are not changeable.
-        TABLE_NAME_DICT = {
-            'user_info': 'user_info_table_name',
-            'follow': 'follow_table_name',
-            'fan': 'fan_table_name',
-            'post_info': 'post_info_table_name',
-            'text': 'text_table_name',
-            'image': 'image_table_name',
-            'comment': 'comment_table_name',
-            'forward': 'forward_table_name',
-            'thumbup': 'thumbup_table_name'
-        }
-
-        # Your postgresql username.
-        POSTGRESQL_USERNAME = 'your postgresql username'
-        # Your postgresql password.
-        POSTGRESQL_PASSWORD = 'your postgresql password'
-        # Your postgresql host.
-        POSTGRESQL_HOST = 'your postgresql host'
-        # Your postgresql databaes.
-        POSTGRESQL_DATABASE = 'your postgresql database name'
-
-        # The IDs of users you want to crawl.
-        CRAWLED_WEIBO_ID_LIST = ['123456789', '246812345', ...]
-
-        # Email notification.
-        MAIL_ENABLED = False
-        MAIL_FROM = 'your email'
-        MAIL_HOST = 'your email smtp server host'
-        # Your email smtp server port
-        MAIL_PORT = 587
-        MAIL_USER = 'your email'
-        MAIL_PASS = 'your email password'
-        # YOur email smtp server port type
-        MAIL_TLS = True
-        MAIL_SSL = False
-        TO_ADDR = 'send to where'
     ```
-
-    其中，各个表的所有列的字段及数据类型分别为（它们不能被改变，表名可以改变）：
-    
-    -   user_info 对应表的结构为： **(user_id varchar(20), user_name text, gender varchar(5), district text)**
-    -   follow 对应表的结构为： **(user_id varchar(20), follow_list text[])**
-    -   fan 对应表的结构为： **(user_id varchar(20), fan_list text[])**
-    -   post_info 对应表的结构为： **(user_id varchar(20), post_id varchar(20), publist_time text)**
-    -   text 对应表的结构为： **(user_id varchar(20), post_id varchar(20), text text)**
-    -   image 对应表的结构为： **(user_id varchar(20), post_id varchar(20), image_list text[])**
-    -   comment 对应表的结构为： **(user_id varchar(20), post_id varchar(20), comment_list json)**
-    -   forward 对应表的结构为： **(user_id varchar(20), post_id varchar(20), forward_list json)**
-    -   thumbup 对应表的结构为： **(user_id varchar(20), post_id varchar(20), thumbup_list json)**
 
     还有一些其他配置项，详见 settings.py。
 
